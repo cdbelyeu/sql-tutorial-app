@@ -24,16 +24,6 @@ var executeQuery = (queryString, params) => {
         });    
 }
 
-var makeId = (length) => {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-       result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
- }
-
 var getAll = () => {
     return executeQuery(
         'SELECT * ' + 
@@ -44,8 +34,10 @@ var getAll = () => {
 
 var getOne = (slug) => {
     return executeQuery(
-        'SELECT NULL',//todo
-        []
+        'SELECT * ' +
+        'FROM post ' + 
+        'WHERE post.slug = $1 ',
+        [slug]
     ).then(posts => {
         return posts[0];
     });
@@ -53,8 +45,10 @@ var getOne = (slug) => {
 
 var getByAuthorName = (authorName) => {
     return executeQuery(
-        'SELECT NULL',//todo
-        []
+        'SELECT * ' +
+        'FROM post ' + 
+        'WHERE post.author_name = $1',
+        [authorName]
     )
 }
 
@@ -68,17 +62,30 @@ var saveNewPost = (post) => {
     };
 
     return executeQuery(
-        'SELECT NULL',//todo
-        []
+        'INSERT INTO post(title, slug, body, author_name) ' +
+        'VALUES($1, $2, $3, $4) ',
+        [post.title, post.slug, post.body, post.author_name]
     ).then(result => {
         return getOne(post.slug);
     });
 }
 
+var makeId = (length) => {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+ }
+
 var update = (post) => {
     return executeQuery(
-        'SELECT NULL',//todo
-        []
+        'UPDATE post ' + 
+        'SET title = $1, body = $2 ' +
+        'WHERE slug = $3 ',
+        [post.title, post.body, post.slug]
     ).then(result => {
         return getOne(post.slug);
     })
@@ -86,8 +93,9 @@ var update = (post) => {
 
 var deletePost = (slug) => {
     return executeQuery(
-        'SELECT NULL',//todo
-        []
+        'DELETE FROM post ' + 
+        'WHERE slug = $1',
+        [slug]
     )
 };
 
